@@ -1,7 +1,7 @@
 if (browser.devtools && browser.devtools.panels) {
   browser.devtools.panels.create(
     "Req",
-    "icons/image.png",
+    "icons/panel.png",
     "panel.html"
   );
 } else {
