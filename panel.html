@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #ffffff;
+      --fg: #15141a;
+      --muted: #5b5b66;
+      --toolbar-bg: #f9f9fb;
+      --header-bg: #f0f0f4;
+      --border: #cfcfd8;
+      --row-border: #e0e0e6;
+      --row-odd: #ffffff;
+      --row-even: #fafafa;
+      --row-hover: #eaf3ff;
+      --input-bg: #ffffff;
+      --focus: #0060df;
+      --method-get: #0060df;
+      --method-post: #058b00;
+      --method-put: #c45a00;
+      --method-delete: #d70022;
+      --status-ok: #058b00;
+      --status-redirect: #8f6a00;
+      --status-error: #d70022;
+      --search-hit-bg: #ffd862;
+      --search-hit-fg: #15141a;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1b22;
+        --fg: #fbfbfe;
+        --muted: #bfbfc9;
+        --toolbar-bg: #23222b;
+        --header-bg: #2b2a33;
+        --border: #4a4a55;
+        --row-border: #3a3944;
+        --row-odd: #1c1b22;
+        --row-even: #22212a;
+        --row-hover: #17324d;
+        --input-bg: #1c1b22;
+        --focus: #80bfff;
+        --method-get: #80bfff;
+        --method-post: #7ee787;
+        --method-put: #ffb86c;
+        --method-delete: #ff7b72;
+        --status-ok: #7ee787;
+        --status-redirect: #ffcc66;
+        --status-error: #ff7b72;
+        --search-hit-bg: #6b5600;
+        --search-hit-fg: #fbfbfe;
+      }
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-sizing: border-box;
+      border-bottom: 1px solid var(--border);
+      background: var(--toolbar-bg);
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .filter-icon {
+      position: absolute;
+      top: 50%;
+      left: 8px;
+      width: 14px;
+      height: 14px;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .filter-icon svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    #search {
+      box-sizing: border-box;
+      width: 100%;
+      height: 28px;
+      padding: 3px 8px 3px 28px;
+      border: 0;
+      border-radius: 0;
+      background: var(--input-bg);
+      color: var(--fg);
+      font: inherit;
+      outline: none;
+    }
+
+    #search::placeholder {
+      color: var(--muted);
+    }
+
+    #search:focus {
+      box-shadow: inset 0 0 0 1px var(--focus);
+    }
+
+    .header {
+      position: sticky;
+      top: 29px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      min-height: 26px;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    #list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      min-height: 30px;
+      border-bottom: 1px solid var(--row-border);
+      transition: background-color 0.12s ease;
+      cursor: pointer;
+    }
+
+    .item:nth-child(odd) {
+      background: var(--row-odd);
+    }
+
+    .item:nth-child(even) {
+      background: var(--row-even);
+    }
+
+    .item:hover {
+      background: var(--row-hover);
+    }
+
+    .method,
+    .status,
+    .path {
+      box-sizing: border-box;
+      min-height: inherit;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      border-right: 1px solid var(--row-border);
+    }
+
+    .header .method,
+    .header .status,
+    .header .path {
+      border-right-color: var(--border);
+    }
+
+    .method {
+      flex: 0 0 64px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .status {
+      flex: 0 0 58px;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+
+    .status-ok {
+      color: var(--status-ok);
+    }
+
+    .status-redirect {
+      color: var(--status-redirect);
+    }
+
+    .status-error {
+      color: var(--status-error);
+      font-weight: 600;
+    }
+
+    .method-GET {
+      color: var(--method-get);
+    }
+
+    .method-POST {
+      color: var(--method-post);
+    }
+
+    .method-PUT {
+      color: var(--method-put);
+    }
+
+    .method-DELETE {
+      color: var(--method-delete);
+    }
+
+    .path {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--fg);
+      border-right: 0;
+    }
+
+    .search-hit {
+      background: var(--search-hit-bg);
+      color: var(--search-hit-fg);
+    }
+
+    .empty {
+      padding: 16px 8px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="filter-icon" aria-hidden="true">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M1.5 3h13L10 8.2V13l-3-1.7V8.2L1.5 3z"/>
+        </svg>
+      </span>
+      <input id="search" type="search" autocomplete="off">
+    </div>
+  </div>
+  <div class="header">
+    <span class="method" data-i18n="method"></span>
+    <span class="status" data-i18n="status"></span>
+    <span class="path" data-i18n="path"></span>
+  </div>
+  <div id="list"></div>
+  <script src="panel.js"></script>
+</body>
+</html>

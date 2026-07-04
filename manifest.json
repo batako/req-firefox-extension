@@ -1,0 +1,11 @@
+{
+  "manifest_version": 2,
+  "name": "Req Firefox Extension",
+  "version": "0.1.0",
+  "description": "Export Firefox Network requests as .req files.",
+  "devtools_page": "devtools.html",
+  "permissions": ["downloads"],
+  "background": {
+    "scripts": ["devtools.js"]
+  }
+}
