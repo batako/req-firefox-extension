@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Req Export",
   "version": "0.1.0",
-  "description": "Export Firefox Network requests as .req files.",
+  "description": "Export selected Firefox DevTools Network requests as .req files.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -13,5 +13,14 @@
   "permissions": ["downloads"],
   "background": {
     "scripts": ["background.js"]
+  }
+  ,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "req-export-devtools@batako.net",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
   }
 }
