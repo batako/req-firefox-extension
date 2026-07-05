@@ -68,18 +68,55 @@
       box-sizing: border-box;
       border-bottom: 1px solid var(--border);
       background: var(--toolbar-bg);
+      display: flex;
+      align-items: center;
+    }
+
+    .clear-button {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-right: 1px solid var(--border);
+      border-radius: 0;
+      background: var(--toolbar-bg);
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .clear-button:hover {
+      background: var(--row-hover);
+      color: var(--fg);
+    }
+
+    .clear-button:focus {
+      outline: none;
+      box-shadow: inset 0 0 0 1px var(--focus);
+    }
+
+    .clear-button svg {
+      display: block;
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
     }
 
     .search-wrap {
       position: relative;
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     .filter-icon {
       position: absolute;
       top: 50%;
       left: 8px;
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       transform: translateY(-50%);
       color: var(--muted);
       pointer-events: none;
@@ -158,6 +195,8 @@
 
     .method,
     .status,
+    .payload,
+    .time,
     .path {
       box-sizing: border-box;
       min-height: inherit;
@@ -169,20 +208,31 @@
 
     .header .method,
     .header .status,
+    .header .payload,
+    .header .time,
     .header .path {
       border-right-color: var(--border);
     }
 
     .method {
       flex: 0 0 64px;
+      justify-content: center;
       font-weight: 600;
       letter-spacing: 0.02em;
     }
 
     .status {
       flex: 0 0 58px;
+      justify-content: center;
       font-variant-numeric: tabular-nums;
       color: var(--muted);
+    }
+    .time {
+      flex: 0 0 78px;
+      justify-content: center;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      border-right: 0;
     }
 
     .status-ok {
@@ -221,7 +271,25 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       color: var(--fg);
-      border-right: 0;
+      border-right: 1px solid var(--row-border);
+    }
+
+    .header .path {
+      border-right-color: var(--border);
+    }
+
+    .payload {
+      flex: 0 0 220px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--muted);
+      border-right: 1px solid var(--row-border);
+    }
+
+    .header .payload {
+      border-right-color: var(--border);
     }
 
     .search-hit {
@@ -237,6 +305,11 @@
 </head>
 <body>
   <div class="toolbar">
+    <button id="clearRequests" class="clear-button" type="button" data-i18n-title="clearRequests" aria-label="Clear requests">
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M6 1h4l1 1h3v2H2V2h3l1-1zm-2 4h8l-.6 9H4.6L4 5zm2 1.5.3 6h1l-.3-6H6zm3 0-.3 6h1l.3-6H9z"/>
+      </svg>
+    </button>
     <div class="search-wrap">
       <span class="filter-icon" aria-hidden="true">
         <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
@@ -250,6 +323,8 @@
     <span class="method" data-i18n="method"></span>
     <span class="status" data-i18n="status"></span>
     <span class="path" data-i18n="path"></span>
+    <span class="payload" data-i18n="payload"></span>
+    <span class="time" data-i18n="time"></span>
   </div>
   <div id="list"></div>
   <script src="panel.js"></script>

@@ -1,12 +1,16 @@
 let reloadTimer = null;
 let currentEntries = [];
+let clearedAt = 0;
 
 const messages = {
   en: {
     method: "Method",
     status: "Status",
+    payload: "Parameters",
+    time: "Time",
     path: "Path",
     filterPlaceholder: "Filter requests",
+    clearRequests: "Clear requests",
     loading: "Loading...",
     noCandidates: "No request candidates",
     noMatches: "No matching requests",
@@ -16,8 +20,11 @@ const messages = {
   ja: {
     method: "メソッド",
     status: "状態",
+    payload: "パラメータ",
+    time: "時刻",
     path: "パス",
     filterPlaceholder: "リクエストを検索",
+    clearRequests: "リクエストをクリア",
     loading: "読み込み中...",
     noCandidates: "候補のリクエストがありません",
     noMatches: "一致するリクエストがありません",
@@ -34,6 +41,12 @@ function applyI18n() {
     element.textContent = t[element.dataset.i18n] || "";
   });
 
+  document.querySelectorAll("[data-i18n-title]").forEach(element => {
+    const text = t[element.dataset.i18nTitle] || "";
+    element.title = text;
+    element.setAttribute("aria-label", text);
+  });
+
   document.getElementById("search").placeholder = t.filterPlaceholder;
 }
 
@@ -44,6 +57,38 @@ function getHeaderValue(headers, name) {
 function getDisplayPath(urlString) {
   const url = new URL(urlString);
   return `${url.pathname || "/"}${url.search}`;
+}
+
+function getEntryTime(entry) {
+  if (!entry.startedDateTime) return "-";
+
+  const date = new Date(entry.startedDateTime);
+  if (Number.isNaN(date.getTime())) return "-";
+
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}
+
+function getEntryTimestamp(entry) {
+  if (!entry.startedDateTime) return 0;
+
+  const timestamp = new Date(entry.startedDateTime).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function isAfterClear(entry) {
+  if (clearedAt === 0) return true;
+
+  const timestamp = getEntryTimestamp(entry);
+  return timestamp > clearedAt;
+}
+
+function getRequestPayload(entry) {
+  const payload = entry.request?.postData?.text || "";
+  return payload.replace(/\s+/g, " ").trim() || "-";
 }
 
 function normalizeSearchText(value) {
@@ -212,6 +257,10 @@ function renderRequest(entry) {
   status.className = `status ${getStatusClass(statusCode)}`;
   status.textContent = statusCode || "-";
 
+  const time = document.createElement("span");
+  time.className = "time";
+  time.textContent = getEntryTime(entry);
+
   const displayPath = getDisplayPath(req.url);
   const search = document.getElementById("search").value.trim();
   const highlightIndexes = getSubsequenceHighlightIndexes(search, displayPath);
@@ -220,6 +269,12 @@ function renderRequest(entry) {
   path.className = "path";
   path.title = req.url;
   appendHighlightedText(path, displayPath, highlightIndexes);
+
+  const payloadText = getRequestPayload(entry);
+  const payload = document.createElement("span");
+  payload.className = "payload";
+  payload.title = payloadText === "-" ? "" : payloadText;
+  payload.textContent = payloadText;
 
   div.addEventListener("click", async () => {
     try {
@@ -233,6 +288,8 @@ function renderRequest(entry) {
   div.appendChild(method);
   div.appendChild(status);
   div.appendChild(path);
+  div.appendChild(payload);
+  div.appendChild(time);
 
   return div;
 }
@@ -243,7 +300,9 @@ async function loadRequests() {
 
   try {
     const har = await browser.devtools.network.getHAR();
-    currentEntries = har.entries.filter(shouldIncludeEntry);
+    currentEntries = har.entries
+      .filter(entry => shouldIncludeEntry(entry) && isAfterClear(entry))
+      .sort((a, b) => getEntryTimestamp(b) - getEntryTimestamp(a));
     renderList();
   } catch (error) {
     console.error("Failed to load HAR", error);
@@ -271,6 +330,13 @@ function renderList() {
   for (const entry of entries) {
     list.appendChild(renderRequest(entry));
   }
+}
+
+function clearRequests() {
+  clearedAt = Date.now();
+  currentEntries = [];
+  document.getElementById("search").value = "";
+  renderList();
 }
 
 function scheduleReload() {
@@ -312,6 +378,7 @@ ${body}`;
 }
 
 applyI18n();
+document.getElementById("clearRequests").addEventListener("click", clearRequests);
 document.getElementById("search").addEventListener("input", renderList);
 browser.devtools.network.onRequestFinished.addListener(scheduleReload);
 loadRequests();
