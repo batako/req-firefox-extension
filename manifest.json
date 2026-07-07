@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Req Export",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Export selected Firefox DevTools Network requests as .req files.",
   "icons": {
     "16": "icons/icon-16.png",
